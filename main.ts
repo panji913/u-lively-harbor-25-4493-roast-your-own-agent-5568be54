@@ -4,7 +4,7 @@
 // "verifying" things, then asks its human to confirm twice. This program
 // writes exactly one line of plain text to /output/entry.txt, no trailing
 // newline, so the sealed gate sees 1-140 characters and nothing else.
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 
 const ROAST =
@@ -21,3 +21,9 @@ if (ROAST.trim() !== ROAST) {
 
 mkdirSync(dirname(OUT), { recursive: true });
 writeFileSync(OUT, ROAST, "utf8");
+
+// Read it back: the file must hold exactly the roast, byte for byte,
+// with no trailing newline smuggled in by the writer.
+if (readFileSync(OUT, "utf8") !== ROAST) {
+  throw new Error("entry.txt does not match the roast exactly");
+}
